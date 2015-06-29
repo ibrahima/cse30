@@ -38,6 +38,8 @@
 - `mv *source* *dest*`: Move file from source to dest
 - `scp user@host:/path/to/file .`: Secure copy, copy file over ssh from remote host to local machine
     - the last `.` says put it in the current directory
+- editing files: `vim` and `emacs` are some advanced editors, a more simple one is `nano`
+    - `emacs` can transparently edit files over SSH (called TRAMP mode)
 
 ## Getting Help
 
@@ -79,13 +81,15 @@
     - See the manpage for more
 
 ## Compilation process
-- Each source file is translated to an object file
-- The *linker* finds references to libraries or other shared object files and replaces the abstract references with actual addresses (for instance, standard library functions like from `<stdio.h>`) and produces the executable
+- Each source file is translated to an object file by the compiler
+- The *linker* finds references to libraries or other shared object files and replaces abstract references with actual addresses (for instance, standard library functions like from `<stdio.h>`) and produces the executable
 
 ## Other useful utilities
 
 - `objdump`: Lets you inspect an object file (including executables)
-  - `objdump -D` will let you disassemble your binary and look at the assembly code the compiler produced
+    - `objdump -D` will let you disassemble your binary and look at the assembly code the compiler produced
+- `readelf`: Gives information about an ELF format executable (default for Linux)
+    - Eg. `readelf -H *executable*` tells you the architecture the executable is compiled for
 
 ## A note on architectures
 
@@ -169,7 +173,31 @@ all: hello.o util.o
 <#include "src/Makefile2">
 ~~~~~~~~
 
+# GDB
+
 ## GDB
+
+- `gdb` is the GNU debugger
+- Allows you to debug your programs in a more sophisticated way than inserting print statements into your code
+- `gdb *executable*` starts gdb and loads your executable (eg. `gdb hello`)
+- Main features: breakpoints, step by step execution, inspect variables, handle errors
+- Commands have intuitive names, and also can be shortened (eg. `b` instead of `break`)
+
+## GDB commands
+- Once you've loaded a file, `run` or `r` will start execution
+- Add breakpoints by using `break linenumber`
+    - Then, when the program hits that line, it will pause
+    - For multi-file projects, `break filename:linenumber`
+    - Can also add breakpoint on a function to stop at the beginning of that function
+- `info breakpoints` lists breakpoints and their numbers
+- `delete` removes all breakpoints, `delete *number*` deletes numbered breakpoints
+
+## GDB commands
+- `continue` resumes execution after a breakpoint
+- `step` runs one line of code and then stops
+- `list *linenumber*` prints the code around the line number or at the start of a function
+- `print *expression*` prints the value of an expression
+    - Can print variables, arrays, memory addresses, 2+2, etc.
 
 # Turning in homework
 

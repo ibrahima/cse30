@@ -1,0 +1,4 @@
+Host rpi1
+     Hostname me.duckdns.org
+     Port 10022
+     User pi

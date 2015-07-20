@@ -11,6 +11,9 @@ Node *newNode(int val){
 
 Node *insertNext(Node *n, int val){
     Node *next = newNode(val);
+    if(n->next != NULL){
+        next->next = n->next;
+    }
     n->next = next;
     return next;
 }

@@ -11,9 +11,6 @@ TreeNode *newTreeNode(int val){
 }
 
 TreeNode *insert(TreeNode *n, int val){
-    // If n->val < val, it goes into right tree
-    // Else, it goes into left tree
-    // We have found a space for it when
     if(val > n->val){
         if(n->right == NULL){
             n->right = newTreeNode(val);

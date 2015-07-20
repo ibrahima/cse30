@@ -1,3 +1,7 @@
+.syntax unified
+.text
+.align 8
+.global itohex
 .func itohex, itohex
 .type itohex, %function
 

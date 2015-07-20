@@ -2,7 +2,7 @@
 % Ibrahim Awwal
 % July 20, 2015
 
-# ARM Assembly Review
+# ARM Assembly
 
 ## Conditional Execution
 
@@ -21,7 +21,10 @@
 
 ## The Stack
 
-- Stores automatic variables, return address, any registers we need to save before
+- In general, a stack is a Last In, First Out data structure (LIFO)
+- Basic operations: *push* data onto stack, *pop* data off of stack
+- In terms of computer organization, *the stack* is a region of memory that operates in this manner
+- Stores automatic variables, return address, any registers we need to save before calling a function
 
 ## Memory Layout
 
@@ -51,11 +54,38 @@
 ## System Calls: Leveraging the OS
 
 - You can think of it as calling functions which are part of the OS
+- Has a different calling convention from normal functions
+- Each system call has a number associated with it
+- Store parameters in `r0`-`r6`, system call number in `r7`
+- Call syscall using `SVC` instruction
+- Examples: `write` writes to a file descriptor, `sbrk` is for allocating more heap space
+
+## System Calls: References
+
+- Syscall numbers: `/usr/include/arm-linux-gnueabihf/asm/unistd.h`
+- [Linux Syscalls (incl. arguments)](http://lxr.free-electrons.com/source/include/linux/syscalls.h)
+- Manpages are accessible under section 2 (eg. `man 2 write`)
+- [More info](http://thinkingeek.com/2014/05/24/arm-assembler-raspberry-pi-chapter-19/)
 
 # Exercises
 
+## int to hex string
+
+~~~~{.c}
+char *itohex(int x);
+~~~~
+
+- Returns hex representation of integer x as a string
+- eg. `itohex(256)` --> `0x00000100`
+
 ## Linked Lists
 
-## Tree recursion
+~~~~{.c}
+\include{src/ll.h}
+~~~~
 
-## int to string
+## Binary Tree
+
+~~~~{.c}
+\include{src/tree.h}
+~~~~

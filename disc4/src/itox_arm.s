@@ -11,7 +11,11 @@ itohex:
     mov r0, #11
     mov r4, #0
     bl malloc @ r0 contains our pointer
-    strb r4, [r0 #0]
+    strb r4, [r0, #10]
+    mov r4, '0'
+    strb r4, [r0, #0]
+    mov r4, 'x'
+    strb r4, [r0, #1]
 return:
     pop {r4-r11, ip, lr} @@ restore caller's registers
     BX lr

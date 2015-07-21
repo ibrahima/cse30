@@ -2,7 +2,7 @@
 .text
 .align 8
 
-@ Node *newNode(int val)
+@@ Node *newNode(int val)
 .global newNode
 .func newNode, newNode
 .type newNode, %function
@@ -15,7 +15,7 @@ return1:
     BX lr
 .endfunc
 
-@ Node *insertNext(Node *n, int val)
+@@ Node *insertNext(Node *n, int val)
 .global insertNext
 .func insertNext, insertNext
 .type insertNext, %function
@@ -28,7 +28,7 @@ return2:
     BX lr
 .endfunc
 
-@ Node *append(Node *n, int val)
+@@ Node *append(Node *n, int val)
 .global append
 .func append, append
 .type append, %function
@@ -41,7 +41,7 @@ return3:
     BX lr
 .endfunc
 
-@ void printList(Node *start)
+@@ void printList(Node *start)
 .global printList
 .func printList, printList
 .type printList, %function
@@ -54,7 +54,7 @@ return4:
     BX lr
 .endfunc
 
-@ int *removeVal(Node *n, int val)
+@@ int *removeVal(Node *n, int val)
 .global removeVal
 .func removeVal, removeVal
 .type removeVal, %function

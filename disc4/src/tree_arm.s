@@ -3,6 +3,7 @@
 .align 8
 
 @@ TreeNode *newTreeNode(int val);
+.global newTreeNode
 .func newTreeNode, newTreeNode
 .type newTreeNode, %function
 newTreeNode:
@@ -14,6 +15,7 @@ return1:
 .endfunc
 
 @@ TreeNode *insert(TreeNode *n, int val);
+.global insert
 .func insert, insert
 .type insert, %function
 insert:
@@ -25,6 +27,7 @@ return2:
 .endfunc
 
 @@ void printInOrder(TreeNode *n);
+.global printInOrder
 .func printInOrder, printInOrder
 .type printInOrder, %function
 
@@ -37,6 +40,7 @@ return3:
 .endfunc
 
 @@ int removeVal(TreeNode *n, int val);
+.global removeVal
 .func removeVal, removeVal
 .type removeVal, %function
 removeVal:

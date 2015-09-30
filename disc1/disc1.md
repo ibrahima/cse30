@@ -1,11 +1,20 @@
 % CSE30 Discussion 1
 % Ibrahim Awwal
-% June 29, 2015
+% September 30, 2015
 
 # Raspberry Pi Setup
 
+## Preliminary note
+
+- All our setup instructions are designed to make things slightly easier for you
+- In particular they handle the case where you don't have an HDMI monitor or a router
+- If you already have a Raspberry Pi or know how to set it up with your home router, you can try to use a stock Raspbian image, but fall back on our instructions
+
 ## Creating your SD Card
+
 - Download the image file, unzip it, and use the appropriate tool for your platform to burn the contents to your SD card
+    - [3GB compressed image](https://drive.google.com/file/d/0B__7284Jee0fcS03Wm16TVctNzQ/view?usp=sharing)
+    - [1GB compressed image](https://drive.google.com/file/d/0B77KlHZNvhR9M1FyU0VpVEdzY0E/view?usp=sharing) - missing `vncserver`, will fix when I get a chance. Otherwise this is probably a better option
 - Linux: dd
 - OS X: [Apple-Pi Baker](http://www.tweaking4all.com/hardware/raspberry-pi/macosx-apple-pi-baker/)
 - Windows: [Win32 Disk Imager](http://sourceforge.net/projects/win32diskimager/)
@@ -14,20 +23,22 @@
 ## Direct ethernet connection
 
 - Plug an ethernet cable between your Raspberry Pi and your computer
-- Set a static IP address on your computer on the 192.168.2.x *subnet*
+- Set a static IP address on your computer on the 192.168.2.x *subnet* (eg. 192.168.2.12)
+- If you don't do this, you will get network errors
+- Get a USB-ethernet adapter if you don't have an ethernet port
 
 ## SSH
 - Secure SHell: A command and protocol for secure remote login
-- Generally, use a command of the form `ssh username@server`
-- `ssh pi@rpi.local` or `ssh pi@192.168.2.2`
+- Generally, use a command of the form `ssh username@@server`
+- `ssh pi@@rpi.local` or `ssh pi@@192.168.2.2`
 - To avoid having to type a password, look into ssh key generation
 - Use `ssh-copy-id` or copy your *public* key to `~/.ssh/authorized_keys`
 - Store frequently used host configurations in `~/.ssh/config`
 
 ## Connecting to Wifi
-- Easier if you have a monitor connected via HDMI
+- Easier if you have a GUI on monitor or Remote Desktop
 - Run the command `wpa_gui` to select a network and authenticate
-- Might be able to run this over SSH if you enable X forwarding (`ssh -X` or `ssh -Y`)and have an X server installed (see Xming on Windows)
+- You can run this over SSH if you enable X forwarding (`ssh -X` or `ssh -Y`)and have an X server installed (see Xming on Windows)
 
 ## Basic Unix commands
 
@@ -38,6 +49,7 @@
 - `mv *source* *dest*`: Move file from source to dest
 - `scp user@host:/path/to/file .`: Secure copy, copy file over ssh from remote host to local machine
     - the last `.` says put it in the current directory
+    - for turning in homeworks, you may have to scp from Pi to laptop and then laptop to ieng6 if your Pi has no internet access
 - editing files: `vim` and `emacs` are some advanced editors, a more simple one is `nano`
     - `emacs` can transparently edit files over SSH (called TRAMP mode)
 
@@ -54,22 +66,41 @@
     1. We don't know the IP address
     2. The SSH port may be closed by our router's firewall (not the case on UCSD-PROTECTED)
 
-## Bonus: Dynamic DNS and Remote SSH
-- Solutions:
-    1. Dynamic DNS: Our RPi can tell a DNS server online what its IP address is, so that we can have a nice name like `my-rpi.duckdns.org`
-        - Some free services: [DuckDNS](https://www.duckdns.org/), [No-IP](http://www.noip.com/)
-    2. Port forwarding: Open a port on your router for ssh, forward incoming traffic on that port to your Raspberry Pi
-        - Eg. forward port 10022 on your router to port 22 on your Raspberry Pi
-        - Instructions for doing this are router specific
-        - Need to add an argument to ssh to use the correct port
-        - If you don't control your router, you can set up a [reverse SSH tunnel](http://www.tunnelsup.com/raspberry-pi-phoning-home-using-a-reverse-remote-ssh-tunnel) (complicated and you need some other publicly accessible ssh server)
+## Solution 1: Dynamic DNS
+
+- Lets you set up a custom domain name for your public IP address (which could change)
+- spispis-30XXX.dynamic.ucsd.edu is an example of this
+- [DuckDNS](https://www.duckdns.org/) is one free no-nonsense service provider, feel free to use any other (eg. [No-IP](http://www.noip.com/))
+- Detailed instructions are **[on github](http://github.com/ibrahima/raspi_networking/master/duckdns.md)**
+- Once you've set this up, you can then do `ssh pi@@you.duckdns.org -p 10022`
+
+## Solution 2: Port forwarding
+
+- Makes a local port available on the internet on a different port (not needed from UCSD-PROTECTED)
+- This means you can ssh into your Raspberry Pi from outside your LAN
+- Run `rpi_upnp.sh` from **[github.com/ibrahima/raspi_networking](http://github.com/ibrahima/raspi_networking)**
+    - Uses UPnP to automatically open an external port on your router
+    - Default port is 10022
+- `ssh pi@@your-public-ip -p 10022`
+- You can also do manual port forwarding via your router's control panel but this is probably easier
+
+## SSH configuration
+
+- Can store commonly used hosts in `~/.ssh/config` (Linux/Mac)
+
+~~~~ {.config}
+\include{src/ssh_config}
+~~~~
+
+- If you **[set up an SSH key](https://www.digitalocean.com/community/tutorials/how-to-set-up-ssh-keys--2)** without a passphrase or use `ssh-agent`, you can avoid typing your password too
+- Now you can just type `ssh rpi1` and log in immediately!
 
 # C Programming
 
 ## The C Programming Language
 
 ~~~~~~~~ {#mycode .c .numberLines}
-<#include "src/hello.c">
+\include{src/hello.c}
 ~~~~~~~~
 
 ## gcc
@@ -81,8 +112,11 @@
     - See the manpage for more
 
 ## Compilation process
-- Each source file is translated to an object file by the compiler
-- The *linker* finds references to libraries or other shared object files and replaces abstract references with actual addresses (for instance, standard library functions like from `<stdio.h>`) and produces the executable
+1. Preprocessor macros are replaced (eg. `#define MAXSIZE 10`)
+2. Each source file is translated to an assembly file by the compiler
+3. The assembler translates the assembly into an object file
+    - `gcc` functions as both a compiler and assembler
+4. The *linker* finds references to libraries or other shared object files and replaces abstract references with actual addresses (for instance, standard library functions like from `<stdio.h>`) and produces the executable
 
 ## Other useful utilities
 
@@ -152,13 +186,13 @@ all: hello.o util.o
 ## Example Makefiles
 
 ~~~~~~~~ {.makefile}
-<#include "src/Makefile1">
+\include{src/Makefile1}
 ~~~~~~~~
 
 ## Example Makefiles
 
 ~~~~~~~~ {.makefile}
-<#include "src/Makefile">
+\include{src/Makefile}
 ~~~~~~~~
 
 - How does this work?
@@ -170,7 +204,7 @@ all: hello.o util.o
 - Taken from [http://mrbook.org/blog/tutorials/make/](http://mrbook.org/blog/tutorials/make/)
 
 ~~~~~~~~ {.makefile}
-<#include "src/Makefile2">
+\include{src/Makefile2}
 ~~~~~~~~
 
 # GDB
@@ -198,14 +232,15 @@ all: hello.o util.o
 - `list *linenumber*` prints the code around the line number or at the start of a function
 - `print *expression*` prints the value of an expression
     - Can print variables, arrays, memory addresses, 2+2, etc.
+- `layout split` gives a really nice view of assembly code (useful later)
 
 # Turning in homework
 
 ## turnin
-- (optional) `scp` your files onto `ieng6.ucsd.edu` if you worked elsewhere (necessary for PA2 and PA3)
-    - For PA1, it's easiest to just do it from ieng6
+- (optional) `scp` your files onto `ieng6.ucsd.edu` if you worked elsewhere
 - `ssh` into `ieng6.ucsd.edu`
 - Create a tar file containing all your homework files
     - `tar czf hw1.tar.gz hw1/`
-- Submit using the turnin command: `turnin hw1.tar.gz`
+- Submit using the turnin command: `turnin hw1.tar.gz -p hw1`
 - Submitting again will override the previous submission
+- We might create a streamlined script so that you don't have to remember these details
